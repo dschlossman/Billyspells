@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐝 Spelling Bee Challenge 🐝</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Learn spelling words and collect brainrot characters!">
+    <meta name="theme-color" content="#ff6b6b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Spelling Bee">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='80'>🐝</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f7b731);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 800px;
+            width: 95%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: gold;
+            border-radius: 50%;
+            animation: sparkle 1s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 3em;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #45b7d1);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .character-display {
+            text-align: center;
+            font-size: 120px;
+            margin: 30px 0;
+            min-height: 150px;
+            animation: characterFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes characterFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .word-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .word-number {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .hint-text {
+            font-size: 1.2em;
+            color: #4ecdc4;
+            margin: 10px 0;
+            font-style: italic;
+            min-height: 30px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .letter-input {
+            width: 50px;
+            height: 60px;
+            font-size: 2em;
+            text-align: center;
+            border: 3px solid #4ecdc4;
+            border-radius: 10px;
+            text-transform: lowercase;
+            transition: all 0.3s;
+        }
+
+        .letter-input:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .letter-input.pre-filled {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .letter-input.correct {
+            background: #4caf50;
+            color: white;
+            animation: pulse 0.5s;
+        }
+
+        .letter-input.incorrect {
+            background: #f44336;
+            color: white;
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f7b731 0%, #f39c12 100%);
+            color: white;
+        }
+
+        .attempts {
+            text-align: center;
+            font-size: 1.5em;
+            margin: 20px 0;
+            color: #666;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confettiFall 3s linear;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .trophy-display {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .trophy {
+            font-size: 150px;
+            animation: trophySpin 3s ease-in-out infinite;
+        }
+
+        @keyframes trophySpin {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+        }
+
+        .roblox-reward {
+            font-size: 3em;
+            color: #4caf50;
+            font-weight: bold;
+            margin: 20px 0;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px #4caf50; }
+            50% { text-shadow: 0 0 30px #4caf50, 0 0 50px #4caf50; }
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .character-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .character-card.unlocked {
+            border: 3px solid #4caf50;
+            animation: cardPop 0.5s;
+        }
+
+        .character-card.locked {
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+
+        .brainrot-level {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .level-max {
+            background: linear-gradient(135deg, #f7b731 0%, #f39c12 100%);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes cardPop {
+            0% { transform: scale(0.8); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .character-emoji {
+            font-size: 3em;
+        }
+
+        .character-name {
+            font-size: 0.8em;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .flash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        .flash-overlay.active {
+            animation: flash 0.3s;
+        }
+
+        @keyframes flash {
+            50% { opacity: 0.8; }
+        }
+
+        .player-select-screen, .start-screen, .game-screen, .results-screen, .inventory-screen {
+            display: none;
+        }
+
+        .player-select-screen.active, .start-screen.active, .game-screen.active, .results-screen.active, .inventory-screen.active {
+            display: block;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+
+        .mode-card {
+            background: white;
+            border: 3px solid #4ecdc4;
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .mode-card.selected {
+            border-color: #4caf50;
+            background: #e8f5e9;
+        }
+    </style>
+</head>
+<body>
+    <div class="flash-overlay" id="flashOverlay"></div>
+    <div class="celebration" id="celebration"></div>
+    
+    <div class="container">
+        <!-- Player Selection Screen -->
+        <div class="player-select-screen active" id="playerSelectScreen">
+            <h1>🐝 WHO'S PLAYING? 🐝</h1>
+            <div class="character-display">👦👧</div>
+            <div style="text-align: center; margin: 50px 0;">
+                <h2 style="color: #4ecdc4; font-size: 2.5em; margin-bottom: 40px;">Choose Your Player!</h2>
+                <div class="mode-selector">
+                    <div class="mode-card" onclick="selectPlayer('Billy')" style="cursor: pointer;">
+                        <div style="font-size: 5em; margin: 20px 0;">👦</div>
+                        <h3 style="color: #4ecdc4; font-size: 2.5em;">BILLY</h3>
+                    </div>
+                    <div class="mode-card" onclick="selectPlayer('Frankie')" style="cursor: pointer;">
+                        <div style="font-size: 5em; margin: 20px 0;">👧</div>
+                        <h3 style="color: #ff6b6b; font-size: 2.5em;">FRANKIE</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div class="start-screen" id="startScreen">
+            <h1 id="startScreenTitle">🐝 BILLY'S SPELLING BEE 🐝</h1>
+            <div class="character-display">🎮</div>
+            <div style="text-align: center; margin: 30px 0;">
+                <h2 style="color: #4ecdc4; font-size: 2em;">Spell 20 Words, Earn Robux! 💰</h2>
+                <p style="font-size: 1.3em; margin: 20px 0;">
+                    Each correct word = $0.10 Robux!<br>
+                    Unlock awesome brainrot characters! 🎉
+                </p>
+                <div style="background: #fff3cd; border: 3px solid #ffc107; border-radius: 15px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #856404; font-size: 1.5em;" id="playerStatsTitle">📊 Billy's Stats</h3>
+                    <p style="font-size: 1.2em; margin: 10px 0; color: #333;">
+                        <strong>Games Played:</strong> <span id="gamesPlayed">0</span><br>
+                        <strong>Total Earnings:</strong> <span style="color: #28a745; font-weight: bold;">$<span id="totalEarnings">0.00</span></span>
+                    </p>
+                </div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn-warning" onclick="showInventory()" style="font-size: 1.3em; padding: 12px 30px;">
+                        🎒 View My Brainrot Collection
+                    </button>
+                    <button class="btn-primary" onclick="switchPlayer()" style="font-size: 1.3em; padding: 12px 30px; margin-left: 10px;">
+                        🔄 Switch Player
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mode-selector">
+                <div class="mode-card selected" id="easyMode" onclick="selectMode('easy')">
+                    <h3 style="color: #4caf50; font-size: 1.8em;">😊 EASY MODE</h3>
+                    <p style="font-size: 1.1em; margin-top: 15px;">Some letters filled in!</p>
+                    <p style="font-size: 1.1em;">Perfect for learning!</p>
+                </div>
+                <div class="mode-card" id="hardMode" onclick="selectMode('hard')">
+                    <h3 style="color: #ff6b6b; font-size: 1.8em;">🔥 HARD MODE</h3>
+                    <p style="font-size: 1.1em; margin-top: 15px;">All blank letters!</p>
+                    <p style="font-size: 1.1em;">True champion!</p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-success" onclick="startGame()" style="font-size: 2em; padding: 20px 50px;">
+                    🚀 START GAME! 🚀
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <h1>🐝 Go Billy! 🐝</h1>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="word-info">
+                <div class="word-number" id="wordNumber">Word 1 of 20</div>
+                <div class="character-display" id="characterDisplay">📚</div>
+                <div class="hint-text" id="hintText"></div>
+            </div>
+            
+            <div class="attempts" id="attemptsDisplay">
+                ❤️❤️❤️
+            </div>
+
+            <div class="input-area" id="inputArea"></div>
+
+            <div class="buttons">
+                <button class="btn-primary" onclick="speakWord()">
+                    🔊 Hear Word
+                </button>
+                <button class="btn-warning" onclick="giveHint()">
+                    💡 Get Hint
+                </button>
+                <button class="btn-success" onclick="checkAnswer()">
+                    ✅ Submit Answer
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen">
+            <h1>🎉 GREAT JOB, BILLY! 🎉</h1>
+            <div class="trophy-display">
+                <div class="trophy">🏆</div>
+                <h2 style="font-size: 2.5em; color: #4ecdc4; margin: 20px 0;">
+                    You spelled <span id="correctCount">0</span> out of 20 words!
+                </h2>
+                <div class="roblox-reward" id="robuxReward">
+                    💰 $0.00 ROBUX THIS GAME! 💰
+                </div>
+                <div style="background: #e8f5e9; border-radius: 15px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #2e7d32; font-size: 1.8em;">📈 Total All-Time</h3>
+                    <p style="font-size: 1.5em; color: #333;">
+                        <strong>Games Played:</strong> <span id="finalGamesPlayed">0</span><br>
+                        <strong>Total Earned:</strong> <span style="color: #28a745; font-weight: bold;">$<span id="finalTotalEarnings">0.00</span></span>
+                    </p>
+                </div>
+            </div>
+
+            <h3 style="text-align: center; font-size: 2em; color: #666; margin: 30px 0;">
+                Your Unlocked Characters:
+            </h3>
+            <div class="character-grid" id="characterGrid"></div>
+
+            <div style="background: #fff3cd; border-radius: 15px; padding: 20px; margin: 30px 0;">
+                <h3 style="color: #856404; font-size: 1.5em; text-align: center; margin-bottom: 15px;">📝 Parent Report: Words Billy Knows</h3>
+                <div id="wordReport" style="font-size: 1.1em; color: #333;"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-success" onclick="playAgain()" style="font-size: 1.5em; padding: 15px 40px;">
+                    🔄 Play Again!
+                </button>
+            </div>
+        </div>
+
+        <!-- Inventory Screen -->
+        <div class="inventory-screen" id="inventoryScreen">
+            <h1 id="inventoryTitle">🎒 BILLY'S BRAINROT COLLECTION 🎒</h1>
+            <div style="text-align: center; margin: 30px 0;">
+                <p style="font-size: 1.3em; color: #666;">Level up your brainrot by spelling words correctly!</p>
+                <p style="font-size: 1.1em; color: #666; margin-top: 10px;">Max Level: 100</p>
+            </div>
+            
+            <div class="character-grid" id="inventoryGrid"></div>
+
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn-success" onclick="closeInventory()" style="font-size: 1.5em; padding: 15px 40px;">
+                    ⬅️ Back to Menu
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let PLAYER_NAME = "Billy"; // Will be set by player selection
+        const words = [
+            { word: 'book', character: '📚', hint: 'You read this for stories!' },
+            { word: 'mischievous', character: '😈', hint: 'When you\'re being playfully naughty!' },
+            { word: 'before', character: '⏰', hint: 'Comes earlier in time' },
+            { word: 'little', character: '🐭', hint: 'Not big, but small' },
+            { word: 'basket', character: '🧺', hint: 'You carry Easter eggs in this!' },
+            { word: 'miniature', character: '🔬', hint: 'Tiny or very small version' },
+            { word: 'green', character: '🌿', hint: 'The color of grass and trees' },
+            { word: 'window', character: '🪟', hint: 'You look outside through this' },
+            { word: 'friend', character: '👫', hint: 'Someone you like to play with' },
+            { word: 'whisper', character: '🤫', hint: 'To talk very quietly' },
+            { word: 'courageous', character: '🦁', hint: 'Being very brave!' },
+            { word: 'jungle', character: '🌴', hint: 'Tropical forest with lots of animals' },
+            { word: 'moment', character: '⚡', hint: 'A short amount of time' },
+            { word: 'walked', character: '🚶', hint: 'Past tense of moving on foot' },
+            { word: 'bicycle', character: '🚲', hint: 'Two-wheeled ride you pedal' },
+            { word: 'going', character: '🏃', hint: 'Moving toward somewhere' },
+            { word: 'peculiar', character: '🤪', hint: 'Strange or unusual' },
+            { word: 'settled', character: '🏠', hint: 'Made a home or decided on something' },
+            { word: 'lined', character: '📏', hint: 'Arranged in a row' },
+            { word: 'nine', character: '9️⃣', hint: 'Number after eight!' }
+        ];
+
+        let currentWordIndex = 0;
+        let attempts = 3;
+        let correctWords = 0;
+        let gameMode = 'easy';
+        let unlockedCharacters = [];
+        let hintsUsed = 0;
+
+        // Load or initialize progress data
+        function loadProgress() {
+            const saved = localStorage.getItem(`spellingProgress_${PLAYER_NAME}`);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return {
+                totalGamesPlayed: 0,
+                totalEarnings: 0,
+                wordStats: words.reduce((acc, w) => {
+                    acc[w.word] = { correct: 0, incorrect: 0, lastAttempt: null, level: 0 };
+                    return acc;
+                }, {})
+            };
+        }
+
+        function saveProgress(progress) {
+            localStorage.setItem(`spellingProgress_${PLAYER_NAME}`, JSON.stringify(progress));
+        }
+
+        let progressData = loadProgress();
+
+        function selectPlayer(playerName) {
+            PLAYER_NAME = playerName;
+            progressData = loadProgress();
+            
+            document.getElementById('playerSelectScreen').classList.remove('active');
+            document.getElementById('startScreen').classList.add('active');
+            
+            // Update UI with player name
+            document.getElementById('startScreenTitle').textContent = `🐝 ${PLAYER_NAME.toUpperCase()}'S SPELLING BEE 🐝`;
+            document.getElementById('playerStatsTitle').textContent = `📊 ${PLAYER_NAME}'s Stats`;
+            
+            updateStartScreenStats();
+            playSound(523, 0.3);
+        }
+
+        function switchPlayer() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('playerSelectScreen').classList.add('active');
+        }
+
+        function showInventory() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('inventoryScreen').classList.add('active');
+            document.getElementById('inventoryTitle').textContent = `🎒 ${PLAYER_NAME.toUpperCase()}'S BRAINROT COLLECTION 🎒`;
+            displayInventory();
+        }
+
+        function closeInventory() {
+            document.getElementById('inventoryScreen').classList.remove('active');
+            document.getElementById('startScreen').classList.add('active');
+        }
+
+        function displayInventory() {
+            const grid = document.getElementById('inventoryGrid');
+            grid.innerHTML = '';
+            
+            words.forEach((wordData) => {
+                const stats = progressData.wordStats[wordData.word];
+                const level = stats.level || 0;
+                const isOwned = level > 0;
+                
+                const card = document.createElement('div');
+                card.className = `character-card ${isOwned ? 'unlocked' : 'locked'}`;
+                card.innerHTML = `
+                    ${isOwned ? `<div class="brainrot-level ${level === 100 ? 'level-max' : ''}">Lv${level}</div>` : ''}
+                    <div class="character-emoji">${wordData.character}</div>
+                    <div class="character-name">${wordData.word}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let musicInterval;
+
+        function playBackgroundMusic() {
+            let noteIndex = 0;
+            const melody = [262, 294, 330, 349, 392, 440, 494, 523];
+            
+            musicInterval = setInterval(() => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = melody[noteIndex % melody.length];
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+                
+                noteIndex++;
+            }, 400);
+        }
+
+        function stopBackgroundMusic() {
+            if (musicInterval) {
+                clearInterval(musicInterval);
+            }
+        }
+
+        function playSound(frequency, duration = 0.1, type = 'sine') {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        function selectMode(mode) {
+            gameMode = mode;
+            document.getElementById('easyMode').classList.toggle('selected', mode === 'easy');
+            document.getElementById('hardMode').classList.toggle('selected', mode === 'hard');
+            playSound(440, 0.1);
+        }
+
+        function updateStartScreenStats() {
+            document.getElementById('gamesPlayed').textContent = progressData.totalGamesPlayed;
+            document.getElementById('totalEarnings').textContent = progressData.totalEarnings.toFixed(2);
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('gameScreen').classList.add('active');
+            playBackgroundMusic();
+            playSound(523, 0.2);
+            createSparkles();
+            loadWord();
+        }
+
+        function createSparkles() {
+            setInterval(() => {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + '%';
+                sparkle.style.top = Math.random() * 100 + '%';
+                document.querySelector('.container').appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 1000);
+            }, 500);
+        }
+
+        function loadWord() {
+            const wordData = words[currentWordIndex];
+            attempts = 3;
+            hintsUsed = 0;
+            
+            document.getElementById('wordNumber').textContent = `Word ${currentWordIndex + 1} of 20`;
+            document.getElementById('characterDisplay').textContent = wordData.character;
+            document.getElementById('hintText').textContent = '';
+            updateAttempts();
+            createInputs(wordData.word);
+            updateProgress();
+            
+            const flash = document.getElementById('flashOverlay');
+            flash.classList.add('active');
+            setTimeout(() => flash.classList.remove('active'), 300);
+            
+            playSound(392, 0.2);
+        }
+
+        function createInputs(word) {
+            const inputArea = document.getElementById('inputArea');
+            inputArea.innerHTML = '';
+            
+            const shouldFill = gameMode === 'easy';
+            const fillEvery = 3;
+            
+            for (let i = 0; i < word.length; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.maxLength = 1;
+                input.className = 'letter-input';
+                input.dataset.index = i;
+                input.dataset.letter = word[i];
+                
+                if (shouldFill && i % fillEvery === 0) {
+                    input.value = word[i];
+                    input.classList.add('pre-filled');
+                    input.disabled = true;
+                }
+                
+                input.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toLowerCase();
+                    if (e.target.value && i < word.length - 1) {
+                        const nextInput = inputArea.querySelector(`[data-index="${i + 1}"]`);
+                        if (nextInput && !nextInput.disabled) {
+                            nextInput.focus();
+                        }
+                    }
+                    playSound(300 + i * 20, 0.05);
+                });
+                
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && i > 0) {
+                        const prevInput = inputArea.querySelector(`[data-index="${i - 1}"]`);
+                        if (prevInput && !prevInput.disabled) {
+                            prevInput.focus();
+                        }
+                    }
+                    if (e.key === 'Enter') {
+                        checkAnswer();
+                    }
+                });
+                
+                inputArea.appendChild(input);
+            }
+            
+            const firstInput = inputArea.querySelector('input:not(:disabled)');
+            if (firstInput) {
+                setTimeout(() => firstInput.focus(), 100);
+            }
+        }
+
+        function speakWord() {
+            const word = words[currentWordIndex].word;
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.rate = 0.8;
+            utterance.pitch = 1.2;
+            speechSynthesis.speak(utterance);
+            playSound(440, 0.2);
+            
+            document.getElementById('characterDisplay').style.animation = 'none';
+            setTimeout(() => {
+                document.getElementById('characterDisplay').style.animation = 'characterFloat 3s ease-in-out infinite';
+            }, 10);
+        }
+
+        function giveHint() {
+            if (hintsUsed === 0) {
+                document.getElementById('hintText').textContent = words[currentWordIndex].hint;
+                hintsUsed++;
+                playSound(523, 0.2);
+            } else if (hintsUsed === 1) {
+                speakWord();
+                hintsUsed++;
+            } else {
+                const word = words[currentWordIndex].word;
+                const sentence = `The word is ${word}. For example: ${getSentence(word)}`;
+                const utterance = new SpeechSynthesisUtterance(sentence);
+                utterance.rate = 0.8;
+                speechSynthesis.speak(utterance);
+                hintsUsed++;
+            }
+        }
+
+        function getSentence(word) {
+            const sentences = {
+                'book': 'I love to read a good book',
+                'mischievous': 'That mischievous puppy ate my homework',
+                'before': 'Wash your hands before dinner',
+                'little': 'The little mouse ran away',
+                'basket': 'Put the eggs in the basket',
+                'miniature': 'He has a miniature train set',
+                'green': 'The grass is green',
+                'window': 'Look out the window',
+                'friend': 'You are my best friend',
+                'whisper': 'Please whisper in the library',
+                'courageous': 'The courageous knight saved the day',
+                'jungle': 'Monkeys live in the jungle',
+                'moment': 'Wait just a moment',
+                'walked': 'We walked to school today',
+                'bicycle': 'I ride my bicycle every day',
+                'going': 'We are going to the park',
+                'peculiar': 'That is a peculiar looking bug',
+                'settled': 'The dust settled on the shelf',
+                'lined': 'The students lined up for lunch',
+                'nine': 'I am nine years old'
+            };
+            return sentences[word] || `This is the word ${word}`;
+        }
+
+        function checkAnswer() {
+            const inputs = document.querySelectorAll('.letter-input');
+            const wordData = words[currentWordIndex];
+            let userAnswer = '';
+            
+            inputs.forEach(input => {
+                userAnswer += input.value.toLowerCase();
+            });
+
+            if (userAnswer.length !== wordData.word.length) {
+                playSound(200, 0.3);
+                alert('Please fill in all letters!');
+                return;
+            }
+
+            if (userAnswer === wordData.word) {
+                playCorrectSound();
+                inputs.forEach(input => input.classList.add('correct'));
+                unlockedCharacters.push(wordData);
+                correctWords++;
+                
+                // Track correct answer and level up brainrot
+                progressData.wordStats[wordData.word].correct++;
+                progressData.wordStats[wordData.word].lastAttempt = 'correct';
+                
+                const oldLevel = progressData.wordStats[wordData.word].level || 0;
+                const newLevel = Math.min(oldLevel + 1, 100);
+                progressData.wordStats[wordData.word].level = newLevel;
+                
+                createConfetti();
+                
+                // Show brainrot acquired/level up message
+                const levelUpMsg = oldLevel === 0 
+                    ? `🎉 NEW BRAINROT UNLOCKED! ${wordData.character} ${wordData.word.toUpperCase()} - Level 1!`
+                    : `⬆️ LEVEL UP! ${wordData.character} ${wordData.word.toUpperCase()} is now Level ${newLevel}!`;
+                
+                document.getElementById('hintText').innerHTML = `<span style="color: #4caf50; font-size: 1.4em; font-weight: bold;">${levelUpMsg}</span>`;
+                
+                // Personalized encouragement
+                const encouragements = [
+                    `Awesome, ${PLAYER_NAME}!`,
+                    `Great job, ${PLAYER_NAME}!`,
+                    `Perfect, ${PLAYER_NAME}!`,
+                    `You're crushing it, ${PLAYER_NAME}!`,
+                    `Excellent work, ${PLAYER_NAME}!`
+                ];
+                const encouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+                const utterance = new SpeechSynthesisUtterance(encouragement);
+                speechSynthesis.speak(utterance);
+                
+                setTimeout(() => {
+                    if (currentWordIndex < words.length - 1) {
+                        currentWordIndex++;
+                        loadWord();
+                    } else {
+                        showResults();
+                    }
+                }, 2500);
+            } else {
+                attempts--;
+                playSound(150, 0.4);
+                
+                // Mark correct letters green, incorrect letters red
+                inputs.forEach((input, index) => {
+                    if (!input.disabled) {
+                        const correctLetter = wordData.word[index];
+                        if (input.value.toLowerCase() === correctLetter) {
+                            input.classList.add('correct');
+                            input.disabled = true; // Lock correct letters
+                        } else {
+                            input.classList.add('incorrect');
+                            setTimeout(() => {
+                                input.classList.remove('incorrect');
+                                input.value = ''; // Clear incorrect letters
+                            }, 500);
+                        }
+                    }
+                });
+                
+                updateAttempts();
+                
+                // On last attempt (attempts = 1), fill in all but 1-2 letters
+                if (attempts === 1) {
+                    setTimeout(() => {
+                        const inputsArray = Array.from(inputs);
+                        const emptyInputs = inputsArray.filter(input => !input.disabled && !input.value);
+                        
+                        if (emptyInputs.length > 2) {
+                            // Leave only 1-2 blanks
+                            const numToFill = emptyInputs.length - Math.min(2, emptyInputs.length);
+                            const shuffled = emptyInputs.sort(() => Math.random() - 0.5);
+                            
+                            for (let i = 0; i < numToFill; i++) {
+                                const input = shuffled[i];
+                                const index = parseInt(input.dataset.index);
+                                input.value = wordData.word[index];
+                                input.classList.add('pre-filled');
+                                input.disabled = true;
+                            }
+                        }
+                        
+                        // Focus first empty input
+                        const firstEmpty = inputsArray.find(input => !input.disabled && !input.value);
+                        if (firstEmpty) firstEmpty.focus();
+                    }, 600);
+                }
+                
+                if (attempts <= 0) {
+                    // Track incorrect answer
+                    progressData.wordStats[wordData.word].incorrect++;
+                    progressData.wordStats[wordData.word].lastAttempt = 'incorrect';
+                    
+                    const utterance = new SpeechSynthesisUtterance(`Oops! The word was ${wordData.word}. Let's try the next one, ${PLAYER_NAME}!`);
+                    speechSynthesis.speak(utterance);
+                    
+                    setTimeout(() => {
+                        if (currentWordIndex < words.length - 1) {
+                            currentWordIndex++;
+                            loadWord();
+                        } else {
+                            showResults();
+                        }
+                    }, 3000);
+                } else {
+                    // Focus first non-disabled empty input
+                    setTimeout(() => {
+                        const firstInput = document.querySelector('input:not(:disabled)');
+                        if (firstInput) firstInput.focus();
+                    }, 600);
+                }
+            }
+        }
+
+        function updateAttempts() {
+            const hearts = '❤️'.repeat(attempts) + '🖤'.repeat(3 - attempts);
+            document.getElementById('attemptsDisplay').innerHTML = hearts;
+        }
+
+        function updateProgress() {
+            const progress = ((currentWordIndex + 1) / words.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function playCorrectSound() {
+            [523, 659, 784, 1047].forEach((freq, i) => {
+                setTimeout(() => playSound(freq, 0.2), i * 100);
+            });
+        }
+
+        function createConfetti() {
+            const celebration = document.getElementById('celebration');
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f7b731', '#5f27cd'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-10px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    celebration.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        function showResults() {
+            stopBackgroundMusic();
+            
+            // Update and save progress
+            progressData.totalGamesPlayed++;
+            const gameEarnings = correctWords * 0.10;
+            progressData.totalEarnings += gameEarnings;
+            saveProgress(progressData);
+            
+            document.getElementById('gameScreen').classList.remove('active');
+            document.getElementById('resultsScreen').classList.add('active');
+            
+            document.getElementById('correctCount').textContent = correctWords;
+            document.getElementById('robuxReward').textContent = `💰 $${gameEarnings.toFixed(2)} ROBUX THIS GAME! 💰`;
+            document.getElementById('finalGamesPlayed').textContent = progressData.totalGamesPlayed;
+            document.getElementById('finalTotalEarnings').textContent = progressData.totalEarnings.toFixed(2);
+            
+            // Character grid with levels
+            const grid = document.getElementById('characterGrid');
+            grid.innerHTML = '';
+            
+            words.forEach((wordData, index) => {
+                const stats = progressData.wordStats[wordData.word];
+                const level = stats.level || 0;
+                const isUnlocked = unlockedCharacters.includes(wordData);
+                const isOwned = level > 0;
+                
+                const card = document.createElement('div');
+                card.className = `character-card ${isUnlocked ? 'unlocked' : (isOwned ? 'unlocked' : 'locked')}`;
+                card.innerHTML = `
+                    ${isOwned ? `<div class="brainrot-level ${level === 100 ? 'level-max' : ''}">Lv${level}</div>` : ''}
+                    <div class="character-emoji">${wordData.character}</div>
+                    <div class="character-name">${wordData.word}</div>
+                `;
+                grid.appendChild(card);
+            });
+            
+            // Generate parent report
+            generateParentReport();
+            
+            // Celebration
+            if (correctWords === 20) {
+                createMegaCelebration();
+                const utterance = new SpeechSynthesisUtterance(`Perfect score, ${PLAYER_NAME}! You are a spelling champion!`);
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+            } else if (correctWords >= 15) {
+                createConfetti();
+                const utterance = new SpeechSynthesisUtterance(`Awesome job, ${PLAYER_NAME}! You spelled ${correctWords} words correctly!`);
+                speechSynthesis.speak(utterance);
+            } else {
+                const utterance = new SpeechSynthesisUtterance(`Great effort, ${PLAYER_NAME}! You spelled ${correctWords} words. Keep practicing!`);
+                speechSynthesis.speak(utterance);
+            }
+            
+            playSound(523, 1, 'triangle');
+        }
+
+        function generateParentReport() {
+            const report = document.getElementById('wordReport');
+            
+            // Categorize words
+            const mastered = [];
+            const needsWork = [];
+            const notAttempted = [];
+            
+            words.forEach(wordData => {
+                const stats = progressData.wordStats[wordData.word];
+                const totalAttempts = stats.correct + stats.incorrect;
+                
+                if (totalAttempts === 0) {
+                    notAttempted.push(wordData.word);
+                } else if (stats.correct >= 3 && stats.correct > stats.incorrect) {
+                    mastered.push(wordData.word);
+                } else if (stats.incorrect > stats.correct) {
+                    needsWork.push(wordData.word);
+                } else {
+                    needsWork.push(wordData.word);
+                }
+            });
+            
+            let html = '<div style="text-align: left; max-width: 600px; margin: 0 auto;">';
+            
+            if (mastered.length > 0) {
+                html += '<p><strong style="color: #28a745;">✅ Mastered:</strong> ' + mastered.join(', ') + '</p>';
+            }
+            
+            if (needsWork.length > 0) {
+                html += '<p><strong style="color: #ffc107;">📚 Needs Practice:</strong> ' + needsWork.join(', ') + '</p>';
+            }
+            
+            if (notAttempted.length > 0) {
+                html += '<p><strong style="color: #666;">⏳ Not Yet Attempted:</strong> ' + notAttempted.join(', ') + '</p>';
+            }
+            
+            html += '</div>';
+            report.innerHTML = html;
+        }
+
+        function playAgain() {
+            // Reset game state
+            currentWordIndex = 0;
+            attempts = 3;
+            correctWords = 0;
+            unlockedCharacters = [];
+            hintsUsed = 0;
+            
+            // Show start screen
+            document.getElementById('resultsScreen').classList.remove('active');
+            document.getElementById('startScreen').classList.add('active');
+            updateStartScreenStats();
+        }
+
+        function createMegaCelebration() {
+            for (let i = 0; i < 200; i++) {
+                setTimeout(() => createConfetti(), i * 50);
+            }
+        }
+
+        document.addEventListener('click', () => {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }, { once: true });
+
+        // Initialize stats on page load
+        updateStartScreenStats();
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button on start screen
+            const installBtn = document.createElement('button');
+            installBtn.className = 'btn-primary';
+            installBtn.style.cssText = 'font-size: 1.3em; padding: 12px 30px; margin-top: 20px;';
+            installBtn.innerHTML = '📱 Install as App';
+            installBtn.onclick = async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                    installBtn.style.display = 'none';
+                }
+            };
+            
+            // Add button to start screen
+            const startScreen = document.getElementById('startScreen');
+            if (startScreen) {
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.cssText = 'text-align: center; margin-top: 20px;';
+                buttonContainer.appendChild(installBtn);
+                startScreen.appendChild(buttonContainer);
+            }
+        });
+    </script>
+</body>
+</html>
