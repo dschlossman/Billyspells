@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development Highlights | Build-Ready Site</title>
+    <meta name="description" content="Build-ready development site with free land, free parking, shared special assessments, border-city tax credits, and construction-materials sales tax relief.">
+    <meta name="theme-color" content="#0f3d2e">
+    <style>
+        :root {
+            --green: #0f3d2e;
+            --green-light: #1b6b4d;
+            --gold: #c8a24a;
+            --ink: #1c2a24;
+            --paper: #f7f5ef;
+            --card: #ffffff;
+            --muted: #5d6b63;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--ink);
+            background: var(--paper);
+            line-height: 1.6;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
+            color: #fff;
+            padding: 90px 24px 70px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(200,162,74,0.25), transparent 45%);
+            pointer-events: none;
+        }
+
+        .hero .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-size: 0.8rem;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 5vw, 3.6rem);
+            font-weight: 800;
+            max-width: 900px;
+            margin: 0 auto 18px;
+            line-height: 1.15;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            max-width: 640px;
+            margin: 0 auto 32px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--gold);
+            color: var(--green);
+            font-weight: 800;
+            padding: 12px 26px;
+            border-radius: 999px;
+            font-size: 1.05rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+        }
+
+        /* Highlights */
+        .section {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 72px 24px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2rem;
+            color: var(--green);
+            font-weight: 800;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 48px;
+            font-size: 1.05rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid rgba(15,61,46,0.08);
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 6px 24px rgba(15,61,46,0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 36px rgba(15,61,46,0.14);
+        }
+
+        .card .icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            margin-bottom: 18px;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            color: var(--green);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .card p {
+            color: var(--muted);
+            font-size: 0.98rem;
+        }
+
+        .card .tag {
+            display: inline-block;
+            margin-top: 16px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+
+        /* CTA */
+        .cta {
+            background: var(--green);
+            color: #fff;
+            text-align: center;
+            padding: 64px 24px;
+        }
+
+        .cta h2 {
+            font-size: 1.9rem;
+            margin-bottom: 14px;
+        }
+
+        .cta p {
+            color: rgba(255,255,255,0.85);
+            max-width: 560px;
+            margin: 0 auto 28px;
+        }
+
+        .cta a {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--green);
+            font-weight: 800;
+            text-decoration: none;
+            padding: 16px 40px;
+            border-radius: 999px;
+            font-size: 1.05rem;
+            transition: transform 0.2s ease;
+        }
+
+        .cta a:hover { transform: translateY(-3px); }
+
+        footer {
+            text-align: center;
+            padding: 28px 24px;
+            color: var(--muted);
+            font-size: 0.85rem;
+            background: var(--paper);
+        }
+
+        .disclaimer {
+            max-width: 760px;
+            margin: 0 auto;
+            font-size: 0.78rem;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <div class="eyebrow">Development Opportunity</div>
+        <h1>A Build-Ready Site With Incentives That Pencil Out</h1>
+        <p>Everything you need to break ground is already in place — land, infrastructure, parking, and a stack of tax incentives designed to lower your total cost of development.</p>
+        <span class="badge">🚧 Build-Ready Today</span>
+    </header>
+
+    <main class="section">
+        <h2 class="section-title">Development Highlights</h2>
+        <p class="section-sub">Six reasons to build here instead of anywhere else.</p>
+
+        <div class="grid">
+            <article class="card">
+                <div class="icon">🏞️</div>
+                <h3>Free Land</h3>
+                <p>The development parcel is provided at no land cost to qualified projects — removing one of the largest upfront barriers to getting started.</p>
+                <span class="tag">No Acquisition Cost</span>
+            </article>
+
+            <article class="card">
+                <div class="icon">🅿️</div>
+                <h3>Free Parking</h3>
+                <p>On-site parking is included for tenants, employees, and visitors at no additional cost — no structured-parking premium and no separate lease.</p>
+                <span class="tag">Included On-Site</span>
+            </article>
+
+            <article class="card">
+                <div class="icon">🤝</div>
+                <h3>Shared Special Assessments</h3>
+                <p>Infrastructure special assessments are shared between the public partner and the private developer, splitting the cost of utilities, streets, and site work.</p>
+                <span class="tag">Public / Private Split</span>
+            </article>
+
+            <article class="card">
+                <div class="icon">🏙️</div>
+                <h3>Border-City Tax Credit</h3>
+                <p>The site qualifies for state border-city income tax credits, delivering ongoing savings that reward locating and growing in the district.</p>
+                <span class="tag">State Credit</span>
+            </article>
+
+            <article class="card">
+                <div class="icon">🧱</div>
+                <h3>Construction Materials Sales Tax Relief</h3>
+                <p>Sales tax on construction materials for the project is eligible for exemption or refund — meaningful savings on every dollar of build cost.</p>
+                <span class="tag">Exemption / Refund</span>
+            </article>
+
+            <article class="card">
+                <div class="icon">⚡</div>
+                <h3>Build-Ready Today</h3>
+                <p>The site is shovel-ready: zoning, access, and utilities are in place so you can move from decision to dirt without the usual entitlement delays.</p>
+                <span class="tag">Shovel-Ready</span>
+            </article>
+        </div>
+    </main>
+
+    <section class="cta">
+        <h2>Ready to See the Numbers?</h2>
+        <p>Request the full incentive summary and site package, and we'll walk you through how these highlights apply to your project.</p>
+        <a href="mailto:david@horizonfargo.com?subject=Development%20Site%20Inquiry">Request Site Package</a>
+    </section>
+
+    <footer>
+        <p class="disclaimer">
+            Incentive availability and amounts are subject to program eligibility, qualification, and applicable
+            state and local approvals. Figures and terms shown are illustrative and do not constitute a binding offer.
+            Contact us for current details specific to your project.
+        </p>
+    </footer>
+</body>
+</html>
